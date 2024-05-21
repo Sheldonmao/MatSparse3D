@@ -1,0 +1,154 @@
+name: "matsparse3d_DTU"
+tag: "${rmspace:${basename:${data.root_dir}},_}_matsparse3d"
+exp_root_dir: "outputs"
+seed: 0
+
+data_type: "dtu-datamodule"
+data:
+  root_dir: "DATA/DTU-MVS/SampleSet/MVS-Data/Rectified/scan110_processed"
+  factor: 2
+  train_num_rays: 4096
+  dtu_light_cond: 4
+  dtuhold: 20
+  train_split: "train"
+  val_split: "test"
+  test_split: "test"
+  render_path: "circle"
+  train_views: 5
+  random_camera:
+    height: 216
+    width: 288
+    eval_height: 216
+    eval_width: 288
+    batch_size: 1
+    eval_elevation_deg: 45.
+    eval_fovy_deg: 40.
+    n_val_views: 12
+    fovy_range: [40.0, 40.0] # Zero123 has fixed fovy
+    camera_perturb: 0.0
+    center_perturb: 0.0
+    up_perturb: 0.0
+
+system_type: "zero123n-system"
+system:
+  geometry_type: "implicit-sdf"
+  geometry:
+    n_feature_dims: 72
+    radius: 2.0
+    normal_type: finite_difference
+    # progressive eps from Neuralangelo
+    finite_difference_normal_eps: progressive
+
+    sdf_bias: sphere
+    sdf_bias_params: 0.5
+
+    # coarse to fine hash grid encoding
+    pos_encoding_config:
+      otype: ProgressiveBandHashGrid
+      n_levels: 16
+      n_features_per_level: 2
+      log2_hashmap_size: 19
+      base_resolution: 16
+      per_level_scale: 1.381912879967776 # max resolution 2048
+      start_level: 8 # resolution ~200
+      start_step: 2000
+      update_steps: 500
+    mlp_network_config:
+      otype: "VanillaMLP"
+      activation: "ReLU"
+      output_activation: "none"
+      n_neurons: 64
+      n_hidden_layers: 1
+
+  material_type: "neuspir-material"
+  material:
+    input_feature_dims: ${system.geometry.n_feature_dims}
+    # ambient_only_steps: 2001
+    # albedo_activation: sigmoid
+
+  background_type: "neural-environment-map-background"
+  background:
+    color_activation: sigmoid
+
+  renderer_type: "neuspir-volume-renderer"
+  renderer:
+    radius: ${system.geometry.radius}
+    num_samples_per_ray: 512
+    cos_anneal_end_steps: ${trainer.max_steps}
+    eval_chunk_size: 16384
+    # return_comp_normal: ${gt0:${system.loss.lambda_normal_smooth}}
+    return_normal_perturb: ${gt0:${system.loss.lambda_3d_normal_smooth}}
+    light:
+      base_res: 512
+      brdf_lut_path: "./threestudio/models/materials/renderutils/bsdf_256_256.bin"
+
+  prompt_processor_type: "dummy-prompt-processor"
+  prompt_processor:
+    pretrained_model_name_or_path: ""
+    prompt: ""
+
+  guidance_type: "zero123n-guidance"
+  guidance:
+    pretrained_model_name_or_path: "./load/zero123/zero123-xl.ckpt"
+    pretrained_config: "./load/zero123/sd-objaverse-finetune-c_concat-256.yaml"
+    vram_O: ${not:${gt0:${system.freq.guidance_eval}}}
+    guidance_scale: 3.0
+    min_step_percent: 0.02
+    max_step_percent: 0.98
+
+  freq:
+    n_ref: 2
+    ref_only_steps: 100000
+    guidance_eval: 45  # must not be a multiple of system.freq.n_ref
+    ref_or_zero123: "alternate" # can be "accumulate" or "alternate"
+
+  loggers:
+    wandb:
+      enable: false
+      project: "threestudio"
+
+  loss:
+    lambda_occ: 1.
+    lambda_envmap: 1.
+    lambda_sds: 0.03
+    lambda_rgb: 500.
+    lambda_mask: 50.
+    lambda_depth: 1.
+    lambda_normal_smooth: 0.0
+    lambda_3d_normal_smooth: 5
+    lambda_orient: [0, 1., 20., 5000]
+    lambda_sparsity: 2.0 # should be tweaked for every model
+    lambda_opaque: 0.5
+
+  optimizer:
+    name: Adam
+    args:
+      lr: 0.01
+      betas: [0.9, 0.99]
+      eps: 1.e-8
+    params:
+      geometry:
+        lr: ${system.optimizer.args.lr}
+      background:
+        lr: ${system.optimizer.args.lr}
+      renderer.variance:
+        lr: ${system.optimizer.args.lr}
+      material:
+        lr: ${system.optimizer.args.lr}
+      renderer.env_light:
+        lr: ${system.optimizer.args.lr}
+  exporter:
+    save_video: False
+
+trainer:
+  max_steps: 10000
+  log_every_n_steps: 1
+  num_sanity_val_steps: 0
+  val_check_interval: 500
+  enable_progress_bar: true
+  precision: 16-mixed
+
+checkpoint:
+  save_last: true # save at each validation time
+  save_top_k: -1
+  every_n_train_steps: ${trainer.max_steps}

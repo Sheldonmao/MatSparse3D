@@ -1,0 +1,44 @@
+--extra-index-url https://download.pytorch.org/whl/cu117
+torch==1.13.1+cu117 
+torchvision==0.14.1+cu117 
+torchaudio==0.13.1 
+lightning==2.0.0
+omegaconf==2.3.0
+jaxtyping
+typeguard
+diffusers
+transformers
+# accelerate
+opencv-python
+tensorboard
+matplotlib
+imageio>=2.28.0
+imageio[ffmpeg]
+trimesh
+libigl
+xatlas
+# trimesh[easy]
+networkx
+# pysdf
+# PyMCubes
+wandb
+# gradio
+torchmetrics
+scikit-learn
+gdown
+pandas
+taming-transformers-rom1504 
+Ninja
+
+# bitsandbytes
+# sentencepiece
+# safetensors
+# huggingface_hub
+
+# # for background seperation
+rembg[gpu]
+# carvekit
+
+# for zero123
+einops
+kornia
