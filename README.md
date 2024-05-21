@@ -1,7 +1,9 @@
 
 # MatSparse3D
-This repository contains the code for CVPRW 2024 paper: Generating Material-Aware 3D Models from Sparse Views
+This repository contains the code for PBDL 2024 (CVPR Workshop) paper: **Generating Material-Aware 3D Models from Sparse Views**
 MatSparse3D introduces a novel approach to generate material-aware 3D models from sparse-view images using generative models and efficient pre-integrated rendering. The output of our method is a relightable model that independently models geometry, material, and lighting, enabling downstream tasks to manipulate these components separately. 
+
+![fig_nv_geo](https://github.com/Sheldonmao/MatSparse3D/assets/22072617/b69d573f-d975-4891-bb18-46d7d7c5a387)
 
 ## Install
 create envrionment using `mamba` or `conda`. And install additional packages using pip.
@@ -44,6 +46,15 @@ gdown '1Jrh-bRnJEjyMCS7f-WsaFlccfPjJPPHI&confirm=t'
 ## optionally download omnidata_dpt_normal_v2.ckpt for normal prediction
 # gdown '1wNxVO4vVbDEMEpnAi_jwQObf2MFodcBR&confirm=t' 
 ```
+Preprocessing data, with optional `--use_normal` to estimate the normal if needed. 
+
+``` bash
+# e.g. for sparse-relight data
+python preprocess.py --scene_dir DATA/sparse-relight/cartooncar
+
+# e.g. for DTU data
+python preprocess_DTU.py --scene_dir DATA/DTU-MVS/SampleSet/MVS-Data/Rectified/scan56
+```
 
 
 ## Training
@@ -67,25 +78,19 @@ python launch.py --config configs/zero123n_sparserelight.yaml --train --gpu 0 da
 python launch.py --config configs/nvdiffrec_sparserelight.yaml --train --gpu 0 data.train_views=5
 ```
 
-Preprocessing data, with optional `--use_normal` to estimate the normal if needed. 
-
-``` bash
-# e.g. for sparse-relight data
-python preprocess.py --scene_dir DATA/sparse-relight/cartooncar
-
-# e.g. for DTU data
-python preprocess_DTU.py --scene_dir DATA/DTU-MVS/SampleSet/MVS-Data/Rectified/scan56
-```
-
 ## Model evaluations
 
-### rendering interpolated views
+### Rendering interpolated views
 
 use `--validate` to render interpolated views, an examle is provided in `script_test.sh`
 ``` bash
 # beware to specify the exp_folder
 bash script_validate.sh 
 ```
+
+
+https://github.com/Sheldonmao/MatSparse3D/assets/22072617/386e8817-36a0-46e5-ac24-9ab1db116db1
+
 
 ### Testing
 use `--test` to evaluate on testing views. For sparse-relight dataset, relighting result is also reported. An examle is provided in `script_test.sh`
@@ -94,12 +99,19 @@ use `--test` to evaluate on testing views. For sparse-relight dataset, relightin
 bash script_test.sh 
 ```
 
+
+https://github.com/Sheldonmao/MatSparse3D/assets/22072617/2c93b3d1-c32d-4236-9f93-ed9aac92061d
+
+
 ### Exporting Mesh
 use `--export` to export geometry from trained model, an examle is provided in `script_export.sh`
 ``` bash
 # beware to specify the exp_folder
 bash script_export.sh 
 ```
+
+<img src="https://github.com/Sheldonmao/MatSparse3D/assets/22072617/c27f2ac8-83b9-481b-8404-d7fff62e7a22" alt="drawing" width="400"/>
+
 
 ## Credicted Repos
 Matsparse3D is built on the following open-source projects:
