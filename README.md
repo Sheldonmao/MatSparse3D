@@ -78,9 +78,9 @@ python launch.py --config configs/zero123n_sparserelight.yaml --train --gpu 0 da
 python launch.py --config configs/nvdiffrec_sparserelight.yaml --train --gpu 0 data.train_views=5
 ```
 
-## Model evaluations
+## Model Evaluations
 
-### Rendering interpolated views
+### Rendering Interpolated Views
 
 use `--validate` to render interpolated views, an examle is provided in `script_test.sh`
 ``` bash
@@ -113,9 +113,24 @@ bash script_export.sh
 <img src="https://github.com/Sheldonmao/MatSparse3D/assets/22072617/c27f2ac8-83b9-481b-8404-d7fff62e7a22" alt="drawing" width="400"/>
 
 
-## Credicted Repos
+## Credits
 Matsparse3D is built on the following open-source projects:
 
 - [Threestudio](https://github.com/threestudio-project/threestudio) A unified framework for 3D content creation
 - [stable-dreamfusion](https://github.com/ashawkey/stable-dreamfusion) for Zero-1-to-3 implementation
 - [NeuSPIR](https://github.com/Sheldonmao/NeuSPIR) Learning Relightable Neural Surface using Pre-Integrated Rendering
+
+  
+## Citation
+If MatSparse3D is relevant to your project, please cite our associated paper:
+```
+@InProceedings{mao2023matsparse3d,
+  author={Mao, Shi and Wu, Chenming and Yi, Ran and Shen, Zhelun and Zhang, Liangjun and Heidrich, Wolfgang},
+  title={Generating Material-Aware 3D Models from Sparse Views},
+  booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) Workshops},
+  year={2024},
+  month={June},
+}
+```
+
+
