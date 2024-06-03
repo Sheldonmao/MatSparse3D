@@ -1,6 +1,7 @@
 
 # MatSparse3D
 This repository contains the code for PBDL 2024 (CVPR Workshop) paper: **Generating Material-Aware 3D Models from Sparse Views**
+
 MatSparse3D introduces a novel approach to generate material-aware 3D models from sparse-view images using generative models and efficient pre-integrated rendering. The output of our method is a relightable model that independently models geometry, material, and lighting, enabling downstream tasks to manipulate these components separately. 
 
 ![fig_nv_geo](https://github.com/Sheldonmao/MatSparse3D/assets/22072617/b69d573f-d975-4891-bb18-46d7d7c5a387)
